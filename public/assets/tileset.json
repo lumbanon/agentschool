@@ -1,0 +1,118 @@
+{
+  "tileWidth": 16,
+  "tileHeight": 16,
+  "columns": 8,
+  "tileCount": 27,
+  "imageWidth": 128,
+  "imageHeight": 64,
+  "tiles": {
+    "floor_wood": {
+      "index": 0,
+      "collides": false
+    },
+    "floor_tile": {
+      "index": 1,
+      "collides": false
+    },
+    "floor_carpet": {
+      "index": 2,
+      "collides": false
+    },
+    "wall_top": {
+      "index": 3,
+      "collides": true
+    },
+    "wall_face": {
+      "index": 4,
+      "collides": true
+    },
+    "wall_window": {
+      "index": 5,
+      "collides": true
+    },
+    "door": {
+      "index": 6,
+      "collides": false
+    },
+    "board_L": {
+      "index": 7,
+      "collides": true
+    },
+    "board_M": {
+      "index": 8,
+      "collides": true
+    },
+    "board_R": {
+      "index": 9,
+      "collides": true
+    },
+    "teacher_desk_L": {
+      "index": 10,
+      "collides": true
+    },
+    "teacher_desk_R": {
+      "index": 11,
+      "collides": true
+    },
+    "student_desk": {
+      "index": 12,
+      "collides": true
+    },
+    "chair": {
+      "index": 13,
+      "collides": false
+    },
+    "bookshelf": {
+      "index": 14,
+      "collides": true
+    },
+    "plant": {
+      "index": 15,
+      "collides": true
+    },
+    "locker": {
+      "index": 16,
+      "collides": true
+    },
+    "bulletin": {
+      "index": 17,
+      "collides": true
+    },
+    "office_desk_L": {
+      "index": 18,
+      "collides": true
+    },
+    "office_desk_R": {
+      "index": 19,
+      "collides": true
+    },
+    "office_chair": {
+      "index": 20,
+      "collides": false
+    },
+    "water_cooler": {
+      "index": 21,
+      "collides": true
+    },
+    "rug": {
+      "index": 22,
+      "collides": false
+    },
+    "doormat": {
+      "index": 23,
+      "collides": false
+    },
+    "clock": {
+      "index": 24,
+      "collides": true
+    },
+    "doormat_wood": {
+      "index": 25,
+      "collides": false
+    },
+    "doormat_carpet": {
+      "index": 26,
+      "collides": false
+    }
+  }
+}
