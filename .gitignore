@@ -4,3 +4,11 @@ test-results/
 playwright-report/
 *.tsbuildinfo
 .vite/
+
+# Python backend
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/

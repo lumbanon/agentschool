@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentschool.local/contracts/curriculum-import/v1/lessons.schema.json",
+  "title": "Lessons file: one or more lessons",
+  "type": "object",
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "kind": { "const": "lessons" },
+    "lessons": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/lesson" } }
+  },
+  "required": ["contract_version", "kind", "lessons"],
+  "additionalProperties": false,
+  "$defs": {
+    "lesson": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Convention: <chapter-id>-l<NN>, e.g. addmath-f4-c02-l01." },
+        "revision": { "type": "integer", "minimum": 1, "description": "Bump whenever the content changes. Same id + same revision must mean identical content." },
+        "subject": { "$ref": "common.schema.json#/$defs/subjectId" },
+        "form": { "$ref": "common.schema.json#/$defs/form" },
+        "chapter": { "$ref": "common.schema.json#/$defs/id" },
+        "learning_standards": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/id" }
+        },
+        "title": { "$ref": "common.schema.json#/$defs/localizedText" },
+        "summary": { "$ref": "common.schema.json#/$defs/localizedText" },
+        "estimated_minutes": { "type": "integer", "minimum": 5, "maximum": 120 },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": { "$ref": "common.schema.json#/$defs/localizedText" }
+        },
+        "board": {
+          "description": "Blackboard steps shown in order. Same shape the classroom LessonPanel already renders.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "items": { "$ref": "common.schema.json#/$defs/board_step" }
+        },
+        "exercises": {
+          "description": "Exercise ids, in the order the student meets them. Each must exist in this bundle or in the database.",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/id" }
+        },
+        "source": { "$ref": "common.schema.json#/$defs/source" },
+        "review": { "$ref": "common.schema.json#/$defs/review" }
+      },
+      "required": [
+        "id",
+        "revision",
+        "subject",
+        "form",
+        "chapter",
+        "learning_standards",
+        "title",
+        "objectives",
+        "board",
+        "exercises",
+        "source",
+        "review"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

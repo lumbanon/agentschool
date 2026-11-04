@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentschool.local/contracts/curriculum-import/v1/manifest.schema.json",
+  "title": "Dataset bundle manifest (manifest.json at the bundle root)",
+  "type": "object",
+  "properties": {
+    "contract": { "const": "agentschool.curriculum-import" },
+    "contract_version": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "dataset": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id" },
+        "title": { "type": "string", "minLength": 3, "maxLength": 200 },
+        "version": {
+          "description": "The dataset's own version (independent of the contract version). Semver.",
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+        },
+        "created_at": { "type": "string", "format": "date-time" },
+        "created_by": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "languages": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/language" }, "minItems": 1, "uniqueItems": true }
+      },
+      "required": ["id", "title", "version", "created_at", "created_by", "languages"],
+      "additionalProperties": false
+    },
+    "files": {
+      "description": "Every data file in the bundle. Files not listed here are ignored, except document payloads, which are listed inside documents files.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "$ref": "common.schema.json#/$defs/relativePath" },
+          "kind": { "enum": ["curriculum", "lessons", "exercises", "documents"] },
+          "sha256": { "$ref": "common.schema.json#/$defs/sha256" }
+        },
+        "required": ["path", "kind", "sha256"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["contract", "contract_version", "dataset", "files"],
+  "additionalProperties": false
+}

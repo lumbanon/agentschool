@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentschool.local/contracts/curriculum-import/v1/documents.schema.json",
+  "title": "Documents file: source documents for bulk ingestion (notes, syllabus extracts, references)",
+  "type": "object",
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "kind": { "const": "documents" },
+    "documents": { "type": "array", "minItems": 1, "maxItems": 5000, "items": { "$ref": "#/$defs/document" } }
+  },
+  "required": ["contract_version", "kind", "documents"],
+  "additionalProperties": false,
+  "$defs": {
+    "document": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "path": { "$ref": "common.schema.json#/$defs/relativePath", "description": "The payload file inside the bundle." },
+        "media_type": { "enum": ["text/markdown", "text/plain", "application/pdf"] },
+        "sha256": { "$ref": "common.schema.json#/$defs/sha256", "description": "SHA-256 of the payload file bytes." },
+        "title": { "type": "string", "minLength": 3, "maxLength": 300 },
+        "document_type": { "enum": ["syllabus", "notes", "reference", "past_paper", "marking_scheme", "glossary"] },
+        "language": { "$ref": "common.schema.json#/$defs/language" },
+        "subject": { "$ref": "common.schema.json#/$defs/subjectId" },
+        "form": { "$ref": "common.schema.json#/$defs/form" },
+        "learning_standards": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/id" }
+        },
+        "usage": {
+          "description": "full_text: text may be stored and searched. metadata_only: only the metadata row is kept (e.g. copyrighted textbooks we may cite but not copy).",
+          "enum": ["full_text", "metadata_only"]
+        },
+        "source": { "$ref": "common.schema.json#/$defs/source" },
+        "review": { "$ref": "common.schema.json#/$defs/review" }
+      },
+      "required": ["id", "revision", "path", "media_type", "sha256", "title", "document_type", "language", "subject", "usage", "source", "review"],
+      "allOf": [
+        {
+          "description": "Storing full text needs a licence that allows it.",
+          "if": { "properties": { "usage": { "const": "full_text" } } },
+          "then": {
+            "properties": {
+              "source": {
+                "description": "usage 'full_text' needs source.kind 'original' or a licence that allows storing the text (not 'unknown' / 'all-rights-reserved'). Use usage 'metadata_only' otherwise.",
+                "anyOf": [
+                  { "properties": { "kind": { "const": "original" } } },
+                  { "required": ["license"], "properties": { "license": { "not": { "enum": ["unknown", "all-rights-reserved"] } } } }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}

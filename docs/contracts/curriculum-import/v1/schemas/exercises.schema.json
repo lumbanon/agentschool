@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentschool.local/contracts/curriculum-import/v1/exercises.schema.json",
+  "title": "Exercises file: questions with machine-checkable answers",
+  "type": "object",
+  "properties": {
+    "contract_version": { "$ref": "common.schema.json#/$defs/contractVersion" },
+    "kind": { "const": "exercises" },
+    "exercises": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/exercise" } }
+  },
+  "required": ["contract_version", "kind", "exercises"],
+  "additionalProperties": false,
+  "$defs": {
+    "exercise": {
+      "type": "object",
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Convention: <chapter-id>-e<NNN>, e.g. addmath-f4-c02-e001." },
+        "revision": { "type": "integer", "minimum": 1 },
+        "subject": { "$ref": "common.schema.json#/$defs/subjectId" },
+        "form": { "$ref": "common.schema.json#/$defs/form" },
+        "learning_standards": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "common.schema.json#/$defs/id" }
+        },
+        "prompt": { "$ref": "common.schema.json#/$defs/localizedText" },
+        "answer_format_hint": {
+          "description": "Shown under the answer box, e.g. 'x = 1 or x = 2'. Never the answer itself.",
+          "$ref": "common.schema.json#/$defs/localizedText"
+        },
+        "marks": { "type": "integer", "minimum": 1, "maximum": 20 },
+        "difficulty": { "enum": ["easy", "medium", "hard"] },
+        "answer": { "$ref": "#/$defs/answer" },
+        "hints": { "type": "array", "maxItems": 5, "items": { "$ref": "common.schema.json#/$defs/localizedText" } },
+        "worked_solution": { "type": "array", "maxItems": 20, "items": { "$ref": "common.schema.json#/$defs/board_step" } },
+        "common_mistakes": {
+          "description": "Recognised wrong answers with targeted feedback. Each `answer` uses the same syntax as a student answer and must NOT verify as correct.",
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "properties": {
+              "answer": { "type": "string", "minLength": 1, "maxLength": 300 },
+              "feedback": { "$ref": "common.schema.json#/$defs/localizedText" }
+            },
+            "required": ["answer", "feedback"],
+            "additionalProperties": false
+          }
+        },
+        "source": { "$ref": "common.schema.json#/$defs/source" },
+        "review": { "$ref": "common.schema.json#/$defs/review" }
+      },
+      "required": ["id", "revision", "subject", "form", "learning_standards", "prompt", "marks", "difficulty", "answer", "source", "review"],
+      "additionalProperties": false
+    },
+    "mathText": {
+      "description": "A mathematical value in AgentSchool math syntax (SPEC.md §5), e.g. '-4', '3/2', 'sqrt(2)', '(x - 2)*(x - 3)'.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "variable": { "type": "string", "pattern": "^[a-zA-Z](_[0-9a-zA-Z]+)?$" },
+    "answer": {
+      "description": "Exactly one answer type. The verifier compares meaning, not text.",
+      "type": "object",
+      "required": ["type"],
+      "oneOf": [
+        { "$ref": "#/$defs/answerExpression" },
+        { "$ref": "#/$defs/answerSolutionSet" },
+        { "$ref": "#/$defs/answerNumeric" },
+        { "$ref": "#/$defs/answerInequality" },
+        { "$ref": "#/$defs/answerEquation" },
+        { "$ref": "#/$defs/answerMultipleChoice" },
+        { "$ref": "#/$defs/answerManual" }
+      ]
+    },
+    "answerExpression": {
+      "description": "An algebraic expression, e.g. a factorisation or a simplified form.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "expression" },
+        "variables": { "type": "array", "minItems": 1, "maxItems": 4, "uniqueItems": true, "items": { "$ref": "#/$defs/variable" } },
+        "expected": { "$ref": "#/$defs/mathText" },
+        "form": {
+          "description": "equivalent: any mathematically equal expression. factored: equal AND written as a product of factors irreducible over the rationals. expanded: equal AND written as a sum of monomials (no brackets).",
+          "enum": ["equivalent", "factored", "expanded"]
+        }
+      },
+      "required": ["type", "variables", "expected", "form"],
+      "additionalProperties": false
+    },
+    "answerSolutionSet": {
+      "description": "All solutions of an equation or system. Order does not matter; every solution must be given and no extra ones.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "solution_set" },
+        "variables": { "type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": { "$ref": "#/$defs/variable" } },
+        "solutions": {
+          "description": "Each solution maps every variable to an exact value, e.g. [{\"x\": \"-4\"}, {\"x\": \"3\"}]. Empty array = no real solution.",
+          "type": "array",
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "additionalProperties": { "$ref": "#/$defs/mathText" },
+            "minProperties": 1
+          }
+        },
+        "domain": { "enum": ["real"], "description": "v1 supports real solutions only." }
+      },
+      "required": ["type", "variables", "solutions"],
+      "additionalProperties": false
+    },
+    "answerNumeric": {
+      "description": "A single number, optionally with a unit and rounding rule (e.g. Science calculations).",
+      "type": "object",
+      "properties": {
+        "type": { "const": "numeric" },
+        "expected": { "$ref": "#/$defs/mathText" },
+        "tolerance": {
+          "type": "object",
+          "properties": {
+            "absolute": { "type": "number", "exclusiveMinimum": 0 },
+            "relative": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.5 }
+          },
+          "minProperties": 1,
+          "additionalProperties": false
+        },
+        "decimal_places": { "type": "integer", "minimum": 0, "maximum": 10, "description": "Required rounding of the student's answer, e.g. 2 for '3.14'." },
+        "significant_figures": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "unit": {
+          "description": "Expected unit, written with ASCII exponents, e.g. 'm s^-1', 'kg', 'J'. Students must include it when set.",
+          "type": "string",
+          "maxLength": 40
+        },
+        "accepted_units": {
+          "description": "Other spellings accepted for the same unit, e.g. ['m/s'].",
+          "type": "array",
+          "maxItems": 10,
+          "items": { "type": "string", "maxLength": 40 }
+        }
+      },
+      "required": ["type", "expected"],
+      "not": { "description": "use decimal_places or significant_figures, not both", "required": ["decimal_places", "significant_figures"] },
+      "additionalProperties": false
+    },
+    "answerInequality": {
+      "description": "Solution of an inequality in one variable, e.g. 'x < -2 or x > 3'. Compared as sets of real numbers.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "inequality" },
+        "variable": { "$ref": "#/$defs/variable" },
+        "expected": { "type": "string", "minLength": 3, "maxLength": 300 }
+      },
+      "required": ["type", "variable", "expected"],
+      "additionalProperties": false
+    },
+    "answerEquation": {
+      "description": "An equation, e.g. of a straight line. Accepted if it has exactly the same solution set (so 'y = 2x + 3' and '2x - y + 3 = 0' are both correct).",
+      "type": "object",
+      "properties": {
+        "type": { "const": "equation" },
+        "variables": { "type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": { "$ref": "#/$defs/variable" } },
+        "expected": { "type": "string", "minLength": 3, "maxLength": 300, "pattern": "=" }
+      },
+      "required": ["type", "variables", "expected"],
+      "additionalProperties": false
+    },
+    "answerMultipleChoice": {
+      "type": "object",
+      "properties": {
+        "type": { "const": "multiple_choice" },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "pattern": "^[A-F]$" },
+              "text": { "$ref": "common.schema.json#/$defs/localizedText" }
+            },
+            "required": ["id", "text"],
+            "additionalProperties": false
+          }
+        },
+        "correct": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^[A-F]$" } }
+      },
+      "required": ["type", "options", "correct"],
+      "additionalProperties": false
+    },
+    "answerManual": {
+      "description": "Not machine-checkable (explanations, diagrams, proofs). Answers are recorded and shown as NOT verified.",
+      "type": "object",
+      "properties": {
+        "type": { "const": "manual" },
+        "rubric": { "type": "array", "minItems": 1, "maxItems": 10, "items": { "$ref": "common.schema.json#/$defs/localizedText" } }
+      },
+      "required": ["type", "rubric"],
+      "additionalProperties": false
+    }
+  }
+}

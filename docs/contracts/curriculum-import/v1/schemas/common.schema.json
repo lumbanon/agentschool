@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentschool.local/contracts/curriculum-import/v1/common.schema.json",
+  "title": "AgentSchool curriculum import v1: shared definitions",
+  "$defs": {
+    "contractVersion": {
+      "description": "Semantic version of this contract the file was written against. Major must be 1.",
+      "type": "string",
+      "pattern": "^1\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
+    },
+    "id": {
+      "description": "Stable identifier: lower-case kebab-case, ASCII. Never reuse an id for different content; change the content and bump `revision` instead.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 120
+    },
+    "subjectId": {
+      "description": "Subject identifier. v1 knows exactly these three subjects.",
+      "enum": ["addmath", "math", "science"]
+    },
+    "form": {
+      "description": "Secondary form (tingkatan). v1 covers SPM Forms 4 and 5.",
+      "enum": [4, 5]
+    },
+    "language": {
+      "enum": ["en", "ms"]
+    },
+    "localizedText": {
+      "description": "Plain or rich text in English and/or Bahasa Melayu. At least one language. Rich text: Markdown subset plus inline TeX between single dollar signs, e.g. \"Solve $x^2 - 9 = 0$.\" (see SPEC.md §4).",
+      "type": "object",
+      "properties": {
+        "en": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "ms": { "type": "string", "minLength": 1, "maxLength": 4000 }
+      },
+      "minProperties": 1,
+      "additionalProperties": false
+    },
+    "tex": {
+      "description": "A display-mode TeX expression that must render with KaTeX 0.16 in strict mode. No surrounding $ signs.",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "board_step": {
+      "description": "One step of a worked explanation, as shown on the classroom blackboard.",
+      "type": "object",
+      "properties": {
+        "text": { "$ref": "#/$defs/localizedText" },
+        "math": { "type": "array", "items": { "$ref": "#/$defs/tex" }, "maxItems": 8 }
+      },
+      "required": ["text"],
+      "additionalProperties": false
+    },
+    "source": {
+      "description": "Provenance of the content. Required on every lesson, exercise and document (honest-claims rule).",
+      "type": "object",
+      "properties": {
+        "kind": {
+          "description": "original = written for AgentSchool; adapted = rewritten from a cited source; quoted = reproduced text (needs a licence that allows it); official_reference = only cites official codes/titles, no copied text.",
+          "enum": ["original", "adapted", "quoted", "official_reference"]
+        },
+        "citation": { "type": "string", "minLength": 3, "maxLength": 500 },
+        "url": { "type": "string", "format": "uri", "maxLength": 1000 },
+        "license": {
+          "description": "SPDX identifier (e.g. CC-BY-4.0), or 'permission-granted', 'all-rights-reserved' or 'unknown'.",
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        },
+        "author": { "type": "string", "maxLength": 200 },
+        "generated_with": {
+          "description": "Set when an AI tool drafted the content (e.g. 'codex'). Drafted content must still be human-reviewed before approval.",
+          "type": "string",
+          "maxLength": 100
+        },
+        "notes": { "type": "string", "maxLength": 1000 }
+      },
+      "required": ["kind"],
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "enum": ["adapted", "quoted", "official_reference"] } } },
+          "then": { "required": ["citation"] }
+        },
+        {
+          "if": { "properties": { "kind": { "const": "quoted" } } },
+          "then": {
+            "required": ["license"],
+            "properties": { "license": { "not": { "enum": ["unknown", "all-rights-reserved"] } } }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "review": {
+      "description": "Human review state. Only `approved` content is served to students. Importers treat `approved` as untrusted unless the operator opts in (SPEC.md §7).",
+      "type": "object",
+      "properties": {
+        "status": { "enum": ["draft", "pending_review", "approved", "rejected"] },
+        "reviewed_by": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "reviewed_at": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string", "maxLength": 2000 }
+      },
+      "required": ["status"],
+      "if": { "properties": { "status": { "enum": ["approved", "rejected"] } } },
+      "then": { "required": ["reviewed_by", "reviewed_at"] },
+      "additionalProperties": false
+    },
+    "relativePath": {
+      "description": "Path inside the bundle, forward slashes, no '..', no leading '/'.",
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9._/-]+$",
+      "maxLength": 300
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  }
+}

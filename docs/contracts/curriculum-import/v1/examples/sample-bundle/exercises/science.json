@@ -1,0 +1,64 @@
+{
+  "contract_version": "1.0.0",
+  "kind": "exercises",
+  "exercises": [
+    {
+      "id": "science-f4-c01-e001",
+      "revision": 1,
+      "subject": "science",
+      "form": 4,
+      "learning_standards": ["science-f4-c01-ls-1-1-1"],
+      "prompt": { "en": "A trolley travels 150 m in 12 s. Calculate its average speed." },
+      "answer_format_hint": { "en": "number and unit, e.g. 3.5 m s^-1" },
+      "marks": 2,
+      "difficulty": "easy",
+      "answer": {
+        "type": "numeric",
+        "expected": "150/12",
+        "tolerance": { "absolute": 0.05 },
+        "unit": "m s^-1",
+        "accepted_units": ["m/s", "ms^-1"]
+      },
+      "source": { "kind": "original", "author": "AgentSchool Phase 1 contract example", "generated_with": "claude-code" },
+      "review": { "status": "draft" }
+    },
+    {
+      "id": "science-f4-c01-e002",
+      "revision": 1,
+      "subject": "science",
+      "form": 4,
+      "learning_standards": ["science-f4-c01-ls-1-1-1"],
+      "prompt": { "en": "Which is the SI unit of speed?" },
+      "marks": 1,
+      "difficulty": "easy",
+      "answer": {
+        "type": "multiple_choice",
+        "options": [
+          { "id": "A", "text": { "en": "km h^-1" } },
+          { "id": "B", "text": { "en": "m s^-1" } },
+          { "id": "C", "text": { "en": "m s^-2" } },
+          { "id": "D", "text": { "en": "N" } }
+        ],
+        "correct": ["B"]
+      },
+      "source": { "kind": "original", "author": "AgentSchool Phase 1 contract example", "generated_with": "claude-code" },
+      "review": { "status": "draft" }
+    },
+    {
+      "id": "science-f4-c01-e003",
+      "revision": 1,
+      "subject": "science",
+      "form": 4,
+      "learning_standards": ["science-f4-c01-ls-1-1-1"],
+      "prompt": { "en": "Explain why a speedometer shows instantaneous speed, not average speed." },
+      "marks": 2,
+      "difficulty": "medium",
+      "answer": {
+        "type": "manual",
+        "rubric": [{ "en": "Mentions speed at one instant / over a very short time." }, { "en": "Contrasts with total distance over total time." }]
+      },
+      "source": { "kind": "original", "author": "AgentSchool Phase 1 contract example", "generated_with": "claude-code" },
+      "review": { "status": "draft" }
+    }
+  ]
+}

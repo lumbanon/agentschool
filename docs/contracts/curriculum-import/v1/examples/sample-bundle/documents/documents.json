@@ -1,0 +1,30 @@
+{
+  "contract_version": "1.0.0",
+  "kind": "documents",
+  "documents": [
+    {
+      "id": "doc-addmath-f4-c02-notes",
+      "revision": 1,
+      "path": "documents/files/addmath-f4-c02-notes.md",
+      "media_type": "text/markdown",
+      "sha256": "dfc9aa6c2ac1c50a7380bda3b52f70e072b48bc1fede7b1fa4bb656edd915eeb",
+      "title": "Quadratic equations: revision notes",
+      "document_type": "notes",
+      "language": "en",
+      "subject": "addmath",
+      "form": 4,
+      "learning_standards": [
+        "addmath-f4-c02-ls-2-1-1"
+      ],
+      "usage": "full_text",
+      "source": {
+        "kind": "original",
+        "author": "AgentSchool Phase 1 contract example",
+        "generated_with": "claude-code"
+      },
+      "review": {
+        "status": "draft"
+      }
+    }
+  ]
+}

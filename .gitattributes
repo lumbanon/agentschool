@@ -1,0 +1,2 @@
+# Contract files are hashed byte-for-byte (SHA-256): keep LF line endings on every platform.
+docs/contracts/** text eol=lf

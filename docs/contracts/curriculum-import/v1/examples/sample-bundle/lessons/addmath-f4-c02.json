@@ -1,0 +1,42 @@
+{
+  "contract_version": "1.0.0",
+  "kind": "lessons",
+  "lessons": [
+    {
+      "id": "addmath-f4-c02-l01",
+      "revision": 1,
+      "subject": "addmath",
+      "form": 4,
+      "chapter": "addmath-f4-c02",
+      "learning_standards": ["addmath-f4-c02-ls-2-1-1"],
+      "title": { "en": "Solving quadratic equations by factorisation", "ms": "Menyelesaikan persamaan kuadratik dengan pemfaktoran" },
+      "summary": { "en": "Find the roots of a quadratic equation by writing it as a product of two linear factors." },
+      "estimated_minutes": 20,
+      "objectives": [
+        { "en": "Factorise a quadratic expression $ax^2 + bx + c$." },
+        { "en": "Use the zero-product property to find both roots." },
+        { "en": "Check roots by substitution." }
+      ],
+      "board": [
+        { "text": { "en": "A quadratic equation in one variable has the general form" }, "math": ["ax^2 + bx + c = 0, \\qquad a \\neq 0"] },
+        {
+          "text": { "en": "Example: solve $x^2 - 5x + 6 = 0$. Look for two numbers whose product is $c = 6$ and whose sum is $b = -5$." },
+          "math": ["(-2) \\times (-3) = 6, \\qquad (-2) + (-3) = -5"]
+        },
+        {
+          "text": { "en": "So the quadratic factorises, and a product is zero only when one of its factors is zero:" },
+          "math": ["(x - 2)(x - 3) = 0", "x = 2 \\quad \\text{or} \\quad x = 3"]
+        },
+        { "text": { "en": "Always check by substituting back into the original equation." }, "math": ["2^2 - 5(2) + 6 = 0 \\;\\checkmark"] }
+      ],
+      "exercises": ["addmath-f4-c02-e001", "addmath-f4-c02-e002", "addmath-f4-c02-e003", "addmath-f4-c02-e004", "addmath-f4-c02-e005"],
+      "source": {
+        "kind": "original",
+        "author": "AgentSchool Phase 0 prototype",
+        "generated_with": "claude-code",
+        "notes": "Converted from the Phase 0 mock lesson. Needs subject-expert review before approval."
+      },
+      "review": { "status": "pending_review" }
+    }
+  ]
+}

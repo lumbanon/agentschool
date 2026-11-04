@@ -1,0 +1,43 @@
+{
+  "contract_version": "1.0.0",
+  "kind": "curriculum",
+  "subject": {
+    "id": "science",
+    "spm_code": "1511",
+    "name": { "en": "Science", "ms": "Sains" }
+  },
+  "framework": {
+    "name": "KSSM",
+    "document": "DSKP KSSM Sains Tingkatan 4 dan 5",
+    "source": {
+      "kind": "official_reference",
+      "citation": "Kementerian Pendidikan Malaysia, DSKP KSSM Sains Tingkatan 4 dan 5. EXAMPLE ONLY: the chapter number, codes and titles here are illustrative placeholders."
+    }
+  },
+  "forms": [
+    {
+      "form": 4,
+      "chapters": [
+        {
+          "id": "science-f4-c01",
+          "number": 1,
+          "title": { "en": "Example chapter: motion (illustrative)" },
+          "content_standards": [
+            {
+              "id": "science-f4-c01-cs-1-1",
+              "code": "1.1",
+              "title": { "en": "Speed (illustrative)" },
+              "learning_standards": [
+                {
+                  "id": "science-f4-c01-ls-1-1-1",
+                  "code": "1.1.1",
+                  "description": { "en": "Calculate speed from distance and time (illustrative)." }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
