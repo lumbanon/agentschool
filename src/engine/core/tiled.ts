@@ -1,4 +1,4 @@
-import type { DoorZone, InteractableZone, MapObjects, Rect, Vec2, WorldDefinition } from './types';
+import type { DoorZone, InteractableZone, MapObjects, Rect, Vec2, WorldDefinition, SeatZone, PropZone } from './types';
 import { pointInRect } from './interaction';
 
 /** Subset of the Tiled JSON format we rely on. */
@@ -50,7 +50,7 @@ function kindOf(o: TiledObject): string | undefined {
 
 export function parseMapObjects(map: TiledMap): MapObjects {
   const layer = map.layers.find((l) => l.name === OBJECT_LAYER && l.type === 'objectgroup');
-  const result: MapObjects = { spawns: {}, doors: [], npcPoints: {}, interactableZones: [] };
+  const result: MapObjects = { spawns: {}, doors: [], npcPoints: {}, interactableZones: [], seats: [], props: [] };
   if (!layer?.objects) return result;
   for (const o of layer.objects) {
     const rect: Rect = { x: o.x, y: o.y, width: o.width, height: o.height };
@@ -72,6 +72,24 @@ export function parseMapObjects(map: TiledMap): MapObjects {
       case 'interactable': {
         const interactableId = prop(o, 'interactableId');
         if (interactableId) result.interactableZones.push({ ...rect, interactableId } satisfies InteractableZone);
+        break;
+      }
+      case 'seat': {
+        const facing = prop(o, 'facing');
+        const sx = Number(prop(o, 'sitX'));
+        const sy = Number(prop(o, 'sitY'));
+        result.seats.push({
+          ...rect,
+          id: o.name || `seat_${o.id}`,
+          sit: { x: Number.isFinite(sx) ? sx : o.x + o.width / 2, y: Number.isFinite(sy) ? sy : o.y + o.height / 2 },
+          facing: facing === 'up' || facing === 'left' || facing === 'right' || facing === 'down' ? facing : 'up',
+          prompt: prop(o, 'prompt') ?? 'Sit down',
+        } satisfies SeatZone);
+        break;
+      }
+      case 'prop': {
+        const propId = prop(o, 'propId');
+        if (propId) result.props.push({ ...rect, propId } satisfies PropZone);
         break;
       }
     }
@@ -125,6 +143,14 @@ export function validateWorld(def: WorldDefinition, maps: Record<string, TiledMa
       if (target.doors.some((d) => pointInRect(spawn, d)))
         errors.push(`room ${door.targetRoom}: spawn '${door.targetSpawn}' lies inside a door zone (would bounce)`);
     }
+  }
+
+  for (const [roomId, obj] of Object.entries(objects)) {
+    const seatIds = obj.seats.map((st) => st.id);
+    const dupSeats = seatIds.filter((id, i) => seatIds.indexOf(id) !== i);
+    if (dupSeats.length) errors.push(`room ${roomId}: duplicate seat ids: ${[...new Set(dupSeats)].join(', ')}`);
+    for (const st of obj.seats)
+      if (obj.doors.some((d) => pointInRect(st.sit, d))) errors.push(`room ${roomId}: seat '${st.id}' sits inside a door zone`);
   }
 
   for (const actor of def.actors) {

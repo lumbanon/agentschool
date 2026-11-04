@@ -16,6 +16,16 @@ describe('world definitions', () => {
     });
   }
 
+  it('detects duplicate seat ids', () => {
+    const def = WORLDS.school;
+    const maps = Object.fromEntries(def.rooms.map((r) => [r.id, loadMap(r.mapUrl)]));
+    const broken = structuredClone(maps);
+    const objects = broken.classroom.layers.find((l) => l.name === 'objects')!.objects!;
+    const seats = objects.filter((o) => o.type === 'seat');
+    seats[1].name = seats[0].name;
+    expect(validateWorld(def, broken).join('\n')).toMatch(/duplicate seat ids/);
+  });
+
   it('detects a broken door target', () => {
     const def = WORLDS.school;
     const maps = Object.fromEntries(def.rooms.map((r) => [r.id, loadMap(r.mapUrl)]));
@@ -65,5 +75,56 @@ describe('engine boundary', () => {
       const code = readFileSync(f, 'utf8').replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, ''); // ignore comments
       expect({ f, match: code.match(banned)?.[0] ?? null }).toEqual({ f, match: null });
     }
+  });
+});
+
+describe('per-object interactions (lockers, shelves, plants)', () => {
+  const school = WORLDS.school;
+  const lines = (id: string) => school.interactables.find((i) => i.id === id)!.interaction.dialogue!.lines.map((l) => l.text).join(' ');
+  const zones = (roomId: string) => parseMapObjects(loadMap(school.rooms.find((r) => r.id === roomId)!.mapUrl)).interactableZones;
+
+  it('each of the six hallway lockers has its own id, zone and different dialogue', () => {
+    const lockers = school.interactables.filter((i) => i.id.startsWith('hallway_locker_'));
+    expect(lockers.map((l) => l.id)).toEqual([1, 2, 3, 4, 5, 6].map((n) => `hallway_locker_${n}`));
+    expect(new Set(lockers.map((l) => lines(l.id))).size).toBe(6);
+    const lockerZones = zones('hallway').filter((z) => z.interactableId.startsWith('hallway_locker_'));
+    expect(lockerZones).toHaveLength(6);
+    expect(new Set(lockerZones.map((z) => z.interactableId)).size).toBe(6);
+    // left to right on the wall: locker 1 is the westmost
+    expect([...lockerZones].sort((a, b) => a.x - b.x).map((z) => z.interactableId)).toEqual(lockers.map((l) => l.id));
+  });
+
+  it('every bookshelf in the school is its own object with different content', () => {
+    const shelves = ['classroom_bookshelf', 'hallway_shelf_returns', 'hallway_shelf_fiction'];
+    expect(new Set(shelves.map(lines)).size).toBe(shelves.length);
+    for (const id of ['hallway_shelf_returns', 'hallway_shelf_fiction']) expect(zones('hallway').filter((z) => z.interactableId === id)).toHaveLength(1);
+  });
+
+  it('no two different physical lockers or shelves share an interactable id', () => {
+    for (const room of ['hallway', 'classroom']) {
+      const shared = new Map<string, number>();
+      for (const z of zones(room)) shared.set(z.interactableId, (shared.get(z.interactableId) ?? 0) + 1);
+      for (const [id, n] of shared) if (/locker|shelf/.test(id)) expect({ id, n }).toEqual({ id, n: 1 });
+    }
+  });
+
+  it('plants are decorative: no plant interactable, no zone on a plant tile, no watering anywhere', () => {
+    expect(school.interactables.some((i) => /plant/.test(i.id))).toBe(false);
+    const plantTiles = [
+      [1, 9],
+      [14, 9],
+    ];
+    for (const [tx, ty] of plantTiles)
+      expect(zones('classroom').some((z) => z.x <= tx * 16 && tx * 16 < z.x + z.width && z.y <= ty * 16 && ty * 16 < z.y + z.height)).toBe(false);
+    const allText = JSON.stringify(Object.values(WORLDS));
+    expect(allText).not.toMatch(/water/i);
+  });
+
+  it('every interactable zone in every map belongs to a defined interactable (no orphan indicators)', () => {
+    for (const def of Object.values(WORLDS))
+      for (const room of def.rooms) {
+        const ids = new Set(def.interactables.filter((i) => i.roomId === room.id).map((i) => i.id));
+        for (const z of parseMapObjects(loadMap(room.mapUrl)).interactableZones) expect({ room: room.id, id: z.interactableId, defined: ids.has(z.interactableId) }).toEqual({ room: room.id, id: z.interactableId, defined: true });
+      }
   });
 });

@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
+import { seedCharacter } from './fixtures';
 import { expectTarget, hold, snap, waitForRoom, walkTo } from './helpers';
 
 test('environment selector switches to the office and back on the same engine', async ({ page }) => {
+  await seedCharacter(page);
   await page.goto('/');
   await waitForRoom(page, 'hallway', 'school');
 
@@ -36,4 +38,15 @@ test('office world loads directly from the URL', async ({ page }) => {
   await page.goto('/?world=office');
   await waitForRoom(page, 'office', 'office');
   await expect(page.getByTestId('world-office')).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('a new player can open the office without creating a character; school still asks first', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByTestId('character-creator')).toBeVisible();
+  await page.getByTestId('world-office').click();
+  await waitForRoom(page, 'office', 'office');
+  expect((await snap(page)).label.text).toBeNull();
+  await expect(page.getByTestId('create-character')).toBeVisible();
+  await page.getByTestId('world-school').click();
+  await expect(page.getByTestId('character-creator')).toBeVisible();
 });

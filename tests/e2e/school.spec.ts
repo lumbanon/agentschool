@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { seedCharacter } from './fixtures';
 import { approachTeacher, enterClassroom, expectTarget, hold, snap, waitForRoom, walkTo } from './helpers';
 
 /*
@@ -8,6 +9,8 @@ import { approachTeacher, enterClassroom, expectTarget, hold, snap, waitForRoom,
  */
 
 test.beforeEach(async ({ page }) => {
+  // Returning player: a saved character skips the creator (see character.spec.ts for first-time players).
+  await seedCharacter(page);
   await page.goto('/');
   await page.evaluate(() => sessionStorage.clear());
   await page.reload();

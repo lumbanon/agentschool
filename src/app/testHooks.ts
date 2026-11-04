@@ -9,6 +9,10 @@ export interface AgentWorldTestHook {
   mode: () => WorldMode;
   roomId: () => string;
   snapshot: () => SceneSnapshot | null;
+  /** Texture key of the player sprite in this world. */
+  playerTextureKey: string;
+  /** Pixel signature of a texture as Phaser holds it (compare with the creator preview). */
+  textureSignature: (key: string) => string | null;
 }
 
 declare global {

@@ -1,5 +1,7 @@
 import type { WorldDefinition } from '../../engine/core/types';
 import { SCHOOL_ACTIONS } from '../../domains/school/actions';
+import { ENVIRONMENT_ACTIONS } from '../../environment/actions';
+import { HALLWAY_LOCKERS, HALLWAY_SHELVES } from './hallwayItems';
 
 /**
  * School World (primary). Pure data: maps, placements and interaction wiring.
@@ -31,7 +33,7 @@ export const schoolWorld: WorldDefinition = {
           speaker: 'Cikgu Aisyah',
           source: 'prototype_script',
           lines: [
-            { text: 'Selamat pagi! Ready for some Additional Mathematics?' },
+            { text: 'Selamat pagi, {playerName}! Welcome to class. Ready for some Additional Mathematics?' },
             { text: "Today's topic is solving quadratic equations by factorisation." },
             {
               text: 'Shall we start the lesson?',
@@ -69,5 +71,72 @@ export const schoolWorld: WorldDefinition = {
         },
       },
     },
+    // ---------------------------------------------------------------- environment & flavour (prototype script)
+    {
+      id: 'classroom_clock',
+      roomId: 'classroom',
+      interaction: {
+        prompt: 'Check the clock',
+        dialogue: { speaker: 'Wall clock', source: 'prototype_script', lines: [{ text: 'Current Malaysia time: {malaysiaTime} (MYT, UTC+8). It is {timeOfDay}.' }] },
+      },
+    },
+    {
+      id: 'classroom_window',
+      roomId: 'classroom',
+      interaction: {
+        prompt: 'Look out of the window',
+        dialogue: {
+          speaker: 'Window',
+          source: 'prototype_script',
+          lines: [{ text: '{windowView}' }, { text: 'The school field stretches out below. It is {malaysiaTime}, Malaysia time.' }],
+        },
+      },
+    },
+    {
+      id: 'classroom_lightswitch',
+      roomId: 'classroom',
+      interaction: { prompt: 'Flip the light switch', action: { kind: ENVIRONMENT_ACTIONS.toggleLights } },
+    },
+    {
+      id: 'classroom_bookshelf',
+      roomId: 'classroom',
+      interaction: {
+        prompt: 'Browse the bookshelf',
+        dialogue: {
+          speaker: 'Bookshelf',
+          source: 'prototype_script',
+          lines: [
+            { text: 'Textbooks for Additional Mathematics, Physics, Chemistry and Biology, plus a very well-used Kamus Dewan.' },
+            { text: 'A sticky note on the bottom shelf: "Past-year SPM papers here. Please return them!"' },
+            { text: 'A rolled-up periodic table poster sits on top, waiting for someone tall enough to put it up.' },
+          ],
+        },
+      },
+    },
+    {
+      id: 'classroom_teacher_desk',
+      roomId: 'classroom',
+      interaction: {
+        prompt: "Look at the teacher's desk",
+        dialogue: {
+          speaker: "Cikgu Aisyah's desk",
+          source: 'prototype_script',
+          lines: [
+            { text: 'A tall stack of exercise books waiting to be marked, a red pen and a mug of teh tarik.' },
+            { text: 'A note taped to the corner says: "Always show your working!"' },
+          ],
+        },
+      },
+    },
+    {
+      id: 'hallway_clock',
+      roomId: 'hallway',
+      interaction: {
+        prompt: 'Check the clock',
+        dialogue: { speaker: 'Hallway clock', source: 'prototype_script', lines: [{ text: 'Current Malaysia time: {malaysiaTime} (MYT, UTC+8).' }] },
+      },
+    },
+    ...HALLWAY_LOCKERS,
+    ...HALLWAY_SHELVES,
   ],
 };

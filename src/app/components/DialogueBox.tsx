@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import type { DialogueChoice, DialogueScript } from '../../engine';
 import { SourceBadge } from './SourceBadge';
+import { fillTemplate } from '../template';
 
 interface Props {
   dialogue: DialogueScript;
   onChoice: (choice: DialogueChoice) => void;
   onClose: () => void;
+  /** Values for `{name}` placeholders in the script, e.g. { playerName: 'Alex' }. */
+  vars?: Record<string, string>;
 }
 
 /** Bottom-of-screen dialogue. Space / Enter / E advance; 1–9 pick a choice; Esc leaves. */
-export function DialogueBox({ dialogue, onChoice, onClose }: Props) {
+export function DialogueBox({ dialogue, onChoice, onClose, vars }: Props) {
   const [index, setIndex] = useState(0);
   const line = dialogue.lines[Math.min(index, dialogue.lines.length - 1)];
   const isLast = index >= dialogue.lines.length - 1;
@@ -55,13 +58,13 @@ export function DialogueBox({ dialogue, onChoice, onClose }: Props) {
         <SourceBadge source={dialogue.source} />
       </header>
       <p className="dialogue-text" data-testid="dialogue-text">
-        {line.text}
+        {fillTemplate(line.text, vars)}
       </p>
       <footer className="dialogue-actions">
         {choices ? (
           choices.map((c, i) => (
             <button key={c.label} ref={i === 0 ? firstButton : undefined} onClick={() => onChoice(c)} data-testid="dialogue-choice">
-              <kbd>{i + 1}</kbd> {c.label}
+              <kbd>{i + 1}</kbd> {fillTemplate(c.label, vars)}
             </button>
           ))
         ) : (

@@ -4,6 +4,11 @@ import type { ActionDescriptor, DialogueScript, WorldDefinition } from '../../sr
 import { DOMAIN_PANELS } from '../../src/domains';
 import { LESSONS } from '../../src/domains/school/lessons';
 import { WORLDS } from '../../src/worlds/registry';
+import { SCHOOL_ACTIONS } from '../../src/domains/school/actions';
+import { ENVIRONMENT_ACTIONS } from '../../src/environment/actions';
+
+/** Actions handled as effects (no panel) by the environment layer (see useEnvironment). */
+const EFFECT_KINDS: string[] = Object.values(ENVIRONMENT_ACTIONS);
 
 function actionsOf(def: WorldDefinition): ActionDescriptor[] {
   const out: ActionDescriptor[] = [];
@@ -24,12 +29,12 @@ describe('domain panel registry', () => {
     it(`${def.id}: every action a world can request has a React panel`, () => {
       const kinds = actionsOf(def).map((a) => a.kind);
       expect(kinds.length).toBeGreaterThan(0);
-      for (const kind of kinds) expect({ kind, registered: kind in DOMAIN_PANELS }).toEqual({ kind, registered: true });
+      for (const kind of kinds) expect({ kind, registered: kind in DOMAIN_PANELS || EFFECT_KINDS.includes(kind) }).toEqual({ kind, registered: true });
     });
   }
 
   it('every lesson the school world opens exists and is a labelled prototype', () => {
-    for (const a of actionsOf(WORLDS.school)) {
+    for (const a of actionsOf(WORLDS.school).filter((x) => x.kind === SCHOOL_ACTIONS.openLesson)) {
       const lesson = LESSONS[String(a.payload?.lessonId)];
       expect(lesson).toBeDefined();
       expect(lesson.source).toBe('prototype_script');

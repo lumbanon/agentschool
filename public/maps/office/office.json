@@ -11,7 +11,7 @@
  "tilewidth": 16,
  "tileheight": 16,
  "nextlayerid": 5,
- "nextobjectid": 4,
+ "nextobjectid": 10,
  "layers": [
   {
    "id": 1,
@@ -528,6 +528,114 @@
        "name": "interactableId",
        "type": "string",
        "value": "office_computer"
+      }
+     ]
+    },
+    {
+     "id": 4,
+     "name": "clock",
+     "type": "interactable",
+     "x": 128,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "office_clock"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "bookshelf",
+     "type": "interactable",
+     "x": 192,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "office_bookshelf"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "clock_face",
+     "type": "prop",
+     "x": 131,
+     "y": 18,
+     "width": 10,
+     "height": 9,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "propId",
+       "type": "string",
+       "value": "clock"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "window_2_view",
+     "type": "prop",
+     "x": 35,
+     "y": 19,
+     "width": 10,
+     "height": 7,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "propId",
+       "type": "string",
+       "value": "window"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "window_5_view",
+     "type": "prop",
+     "x": 83,
+     "y": 19,
+     "width": 10,
+     "height": 7,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "propId",
+       "type": "string",
+       "value": "window"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "window_11_view",
+     "type": "prop",
+     "x": 179,
+     "y": 19,
+     "width": 10,
+     "height": 7,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "propId",
+       "type": "string",
+       "value": "window"
       }
      ]
     }

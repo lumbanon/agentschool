@@ -61,7 +61,18 @@ const MATS = { floor_tile: 'doormat', floor_wood: 'doormat_wood', floor_carpet: 
  *  - door:         rectangle; props.targetRoom, props.targetSpawn
  *  - npc:          point; props.actorId (actor definition lives in the world definition)
  *  - interactable: rectangle; props.interactableId
+ *  - seat:         rectangle (interaction zone); props.facing, props.sitX/sitY (px), props.prompt
+ *                  Seats are added automatically for every chair 'c' (zone = desk above + chair).
+ *  - prop:         runtime-textured overlay; props.propId. `px: [dx, dy, w, h]` places it at an exact
+ *                  pixel rectangle inside tile (x, y) — e.g. just the glass of a window or a clock face.
  */
+
+// Pixel rectangles (inside a 16x16 tile) of art that is redrawn at runtime. Must match generate_assets.py.
+const PX = {
+  windowGlass: [3, 3, 10, 7], // tile_wall_window: glass (3,3)-(12,9)
+  clockFace: [3, 2, 10, 9], // tile_clock: face + rim (3,2)-(12,10)
+  lightSwitch: [6, 4, 4, 6], // plate drawn on a plain wall face
+};
 const MAPS = [
   {
     out: 'public/maps/school/hallway.json',
@@ -82,6 +93,12 @@ const MAPS = [
       { name: 'from_classroom', type: 'spawn', x: 11, y: 3 },
       { name: 'door_classroom', type: 'door', x: 11, y: 1, props: { targetRoom: 'classroom', targetSpawn: 'from_hallway' } },
       { name: 'noticeboard', type: 'interactable', x: 3, y: 1, props: { interactableId: 'hallway_noticeboard' } },
+      { name: 'clock', type: 'interactable', x: 18, y: 1, props: { interactableId: 'hallway_clock' } },
+      { name: 'clock_face', type: 'prop', x: 18, y: 1, px: PX.clockFace, props: { propId: 'clock' } },
+      // every locker and shelf is its own object with its own dialogue (ids match src/worlds/school/hallwayItems.ts)
+      ...[6, 8, 10, 12, 14, 16].map((x, i) => ({ name: `locker_${i + 1}`, type: 'interactable', x, y: 1, props: { interactableId: `hallway_locker_${i + 1}` } })),
+      { name: 'returns_shelf', type: 'interactable', x: 20, y: 1, props: { interactableId: 'hallway_shelf_returns' } },
+      { name: 'fiction_shelf', type: 'interactable', x: 1, y: 7, props: { interactableId: 'hallway_shelf_fiction' } },
     ],
   },
   {
@@ -106,7 +123,18 @@ const MAPS = [
       { name: 'door_hallway', type: 'door', x: 7, y: 11, props: { targetRoom: 'hallway', targetSpawn: 'from_classroom' } },
       { name: 'teacher', type: 'npc', x: 9, y: 3, props: { actorId: 'teacher_aisyah' } },
       { name: 'blackboard', type: 'interactable', x: 4, y: 1, w: 5, h: 1, props: { interactableId: 'classroom_blackboard' } },
+      { name: 'clock', type: 'interactable', x: 12, y: 1, props: { interactableId: 'classroom_clock' } },
+      { name: 'clock_face', type: 'prop', x: 12, y: 1, px: PX.clockFace, props: { propId: 'clock' } },
+      { name: 'window_east', type: 'interactable', x: 10, y: 1, props: { interactableId: 'classroom_window' } },
+      { name: 'window_west', type: 'interactable', x: 14, y: 1, props: { interactableId: 'classroom_window' } },
+      { name: 'window_east_view', type: 'prop', x: 10, y: 1, px: PX.windowGlass, props: { propId: 'window' } },
+      { name: 'window_west_view', type: 'prop', x: 14, y: 1, px: PX.windowGlass, props: { propId: 'window' } },
+      { name: 'light_switch', type: 'interactable', x: 9, y: 1, props: { interactableId: 'classroom_lightswitch' } },
+      { name: 'light_switch_plate', type: 'prop', x: 9, y: 1, px: PX.lightSwitch, props: { propId: 'lightswitch' } },
+      { name: 'bookshelf', type: 'interactable', x: 2, y: 1, props: { interactableId: 'classroom_bookshelf' } },
+      { name: 'teacher_desk', type: 'interactable', x: 6, y: 3, w: 2, h: 1, props: { interactableId: 'classroom_teacher_desk' } },
     ],
+    seats: { prompt: 'Sit at the desk', facing: 'up' },
   },
   {
     out: 'public/maps/office/office.json',
@@ -127,6 +155,10 @@ const MAPS = [
       { name: 'start', type: 'spawn', x: 6, y: 7 },
       { name: 'employee', type: 'npc', x: 10, y: 5, props: { actorId: 'employee_farid' } },
       { name: 'computer', type: 'interactable', x: 3, y: 3, props: { interactableId: 'office_computer' } },
+      { name: 'clock', type: 'interactable', x: 8, y: 1, props: { interactableId: 'office_clock' } },
+      { name: 'bookshelf', type: 'interactable', x: 12, y: 1, props: { interactableId: 'office_bookshelf' } },
+      { name: 'clock_face', type: 'prop', x: 8, y: 1, px: PX.clockFace, props: { propId: 'clock' } },
+      ...[2, 5, 11].map((x) => ({ name: `window_${x}_view`, type: 'prop', x, y: 1, px: PX.windowGlass, props: { propId: 'window' } })),
     ],
   },
 ];
@@ -149,16 +181,32 @@ function buildMap(def) {
     }
   }
   let nextObjectId = 1;
-  const objects = def.objects.map((o) => {
+  const seatObjects = [];
+  if (def.seats) {
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++) {
+        if (def.layout[y][x] !== 'c') continue;
+        seatObjects.push({
+          name: `seat_${x}_${y}`,
+          type: 'seat',
+          x,
+          y: y - 1, // zone covers the desk above and the chair
+          w: 1,
+          h: 2,
+          props: { facing: def.seats.facing, prompt: def.seats.prompt, sitX: String(x * T + T / 2), sitY: String(y * T + T / 2) },
+        });
+      }
+  }
+  const objects = [...def.objects, ...seatObjects].map((o) => {
     const isPoint = o.type === 'spawn' || o.type === 'npc';
     const obj = {
       id: nextObjectId++,
       name: o.name,
       type: o.type,
-      x: isPoint ? o.x * T + T / 2 : o.x * T,
-      y: isPoint ? o.y * T + T / 2 : o.y * T,
-      width: isPoint ? 0 : (o.w ?? 1) * T,
-      height: isPoint ? 0 : (o.h ?? 1) * T,
+      x: isPoint ? o.x * T + T / 2 : o.x * T + (o.px?.[0] ?? 0),
+      y: isPoint ? o.y * T + T / 2 : o.y * T + (o.px?.[1] ?? 0),
+      width: isPoint ? 0 : o.px ? o.px[2] : (o.w ?? 1) * T,
+      height: isPoint ? 0 : o.px ? o.px[3] : (o.h ?? 1) * T,
       rotation: 0,
       visible: true,
     };

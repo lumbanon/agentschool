@@ -3,5 +3,6 @@ export * from './core/types';
 export { WorldController, type ActiveInteraction } from './core/controller';
 export { WorldEventBus } from './core/eventBus';
 export { validateWorld, parseMapObjects, type TiledMap } from './core/tiled';
-export { createWorldGame, type WorldGameHandle } from './phaser/createWorldGame';
-export type { SceneSnapshot } from './phaser/WorldScene';
+export { pixelSignature } from './core/pixels';
+export { createWorldGame, type WorldGameHandle, type WorldGameOptions } from './phaser/createWorldGame';
+export { propTextureKey, sitTextureKey, type Ambience, type SceneSnapshot } from './phaser/WorldScene';

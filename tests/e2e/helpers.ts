@@ -9,6 +9,14 @@ export interface Snap {
   facing: string;
   moving: boolean;
   targetId: string | null;
+  label: { text: string | null; visible: boolean };
+  playerTexture: string;
+  seatId: string | null;
+  props: string[];
+  ambienceAlpha: number;
+  indicator: { visible: boolean; x: number; y: number };
+  targetKey: string | null;
+  feet: { x: number; y: number };
 }
 
 interface Hook {

@@ -28,7 +28,7 @@ export const officeWorld: WorldDefinition = {
           speaker: 'Farid',
           source: 'prototype_script',
           lines: [
-            { text: "Hi boss. I've got the weekly supplier report half done." },
+            { text: "Hi {playerName}. I've got the weekly supplier report half done." },
             {
               text: 'Want to look at my task?',
               choices: [
@@ -48,6 +48,27 @@ export const officeWorld: WorldDefinition = {
       interaction: {
         prompt: 'Use the computer',
         action: { kind: OFFICE_ACTIONS.openTask, payload: { taskId: 'weekly-supplier-report' } },
+      },
+    },
+    {
+      // Same clock prop and environment values as the school: reuse check.
+      id: 'office_clock',
+      roomId: 'office',
+      interaction: {
+        prompt: 'Check the clock',
+        dialogue: { speaker: 'Office clock', source: 'prototype_script', lines: [{ text: 'Current Malaysia time: {malaysiaTime} (MYT, UTC+8).' }] },
+      },
+    },
+    {
+      id: 'office_bookshelf',
+      roomId: 'office',
+      interaction: {
+        prompt: 'Browse the shelf',
+        dialogue: {
+          speaker: 'Office shelf',
+          source: 'prototype_script',
+          lines: [{ text: 'Binders labelled "Supplier contracts", "Q3 invoices" and, oddly, "Potluck sign-up sheets (2019–present)".' }],
+        },
       },
     },
   ],
