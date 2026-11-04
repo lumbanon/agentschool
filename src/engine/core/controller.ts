@@ -140,4 +140,9 @@ export class WorldController {
     });
     return true;
   }
+
+  /** The renderer failed (e.g. an asset did not load). Surfaced to the UI; does not change mode. */
+  reportError(message: string): void {
+    this.bus.emit({ type: 'world.error', message });
+  }
 }

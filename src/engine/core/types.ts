@@ -157,7 +157,8 @@ export type WorldEvent =
   | { type: 'interaction.started'; target: InteractionTarget; dialogue?: DialogueScript }
   | { type: 'action.requested'; action: ActionDescriptor; sourceId: string }
   | { type: 'interaction.ended'; targetId: string }
-  | { type: 'mode.changed'; mode: WorldMode };
+  | { type: 'mode.changed'; mode: WorldMode }
+  | { type: 'world.error'; message: string };
 
 export type WorldEventType = WorldEvent['type'];
 export type WorldEventOf<K extends WorldEventType> = Extract<WorldEvent, { type: K }>;
