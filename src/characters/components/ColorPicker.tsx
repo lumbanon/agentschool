@@ -34,10 +34,22 @@ export function ColorPicker({ slot, label, value, suggested, custom, onChange }:
   useEffect(() => setHexDraft(value), [value]);
   const hexValid = normalizeHex(hexDraft) !== null;
 
-  const commitHex = (text: string) => {
-    setHexDraft(text);
-    const hex = normalizeHex(text);
+  const apply = (hex: string | null) => {
     if (hex && hex !== value) onChange(hex);
+  };
+  /**
+   * While typing, only a complete six-digit value is applied. Shorthand like
+   * "#123" is a prefix of "#123456", so it waits for blur / Enter; otherwise it
+   * would be expanded mid-typing and block the remaining digits.
+   */
+  const typeHex = (text: string) => {
+    setHexDraft(text);
+    if (/^#?[0-9a-f]{6}$/i.test(text.trim())) apply(normalizeHex(text));
+  };
+  const finishHex = () => {
+    const hex = normalizeHex(hexDraft);
+    apply(hex);
+    setHexDraft(hex ?? value);
   };
 
   const palette = PALETTE.filter((c) => !suggested.includes(c.hex));
@@ -65,7 +77,7 @@ export function ColorPicker({ slot, label, value, suggested, custom, onChange }:
             type="color"
             aria-label={`${label}: pick any colour`}
             value={value}
-            onChange={(e) => commitHex(e.target.value)}
+            onChange={(e) => apply(normalizeHex(e.target.value))}
             data-testid={`picker-${slot}`}
           />
           <label htmlFor={id} className="sr-only">
@@ -78,8 +90,11 @@ export function ColorPicker({ slot, label, value, suggested, custom, onChange }:
             spellCheck={false}
             maxLength={7}
             aria-invalid={!hexValid}
-            onChange={(e) => commitHex(e.target.value)}
-            onBlur={() => setHexDraft(value)}
+            onChange={(e) => typeHex(e.target.value)}
+            onBlur={finishHex}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') finishHex();
+            }}
             data-testid={`hex-${slot}`}
           />
           {!hexValid && <span className="field-error">Use #rrggbb</span>}

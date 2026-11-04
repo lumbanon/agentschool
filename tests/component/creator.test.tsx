@@ -88,6 +88,39 @@ describe('CharacterCreator', () => {
     expect(screen.getByTestId('color-top').getAttribute('data-value')).toBe(COLORS.black);
   });
 
+  it('hex input: typing a six-digit colour one key at a time is not cut short by shorthand (PR review regression)', () => {
+    setup();
+    fireEvent.click(screen.getByTestId('custom-colors-toggle'));
+    const input = screen.getByTestId('hex-bottom') as HTMLInputElement;
+    const row = () => screen.getByTestId('color-bottom').getAttribute('data-value');
+    const before = row();
+    let typed = '';
+    for (const ch of '#123456') {
+      typed += ch;
+      fireEvent.change(input, { target: { value: typed } });
+      expect(input.value).toBe(typed); // the draft is never rewritten mid-typing
+      if (typed.length < 7) expect(row()).toBe(before); // nothing applied until complete (not '#112233' at '#123')
+    }
+    expect(row()).toBe('#123456');
+  });
+
+  it('hex input: shorthand is accepted on blur / Enter; invalid text reverts on blur', () => {
+    setup();
+    fireEvent.click(screen.getByTestId('custom-colors-toggle'));
+    const input = screen.getByTestId('hex-bottom') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '#abc' } });
+    expect(screen.getByTestId('color-bottom').getAttribute('data-value')).toBe(COLORS.oliveGreen);
+    fireEvent.blur(input);
+    expect(screen.getByTestId('color-bottom').getAttribute('data-value')).toBe('#aabbcc');
+    fireEvent.change(input, { target: { value: '#123' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(screen.getByTestId('color-bottom').getAttribute('data-value')).toBe('#112233');
+    fireEvent.change(input, { target: { value: '#12' } });
+    fireEvent.blur(input);
+    expect(input.value).toBe('#112233');
+    expect(screen.getByTestId('color-bottom').getAttribute('data-value')).toBe('#112233');
+  });
+
   it('suggested swatches, then full palette + hex input once custom colours are on; preview updates', () => {
     const { signature } = setup();
     const before = signature();

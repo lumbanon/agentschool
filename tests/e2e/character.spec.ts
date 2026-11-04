@@ -56,7 +56,10 @@ test('a new player creates a character before entering the school', async ({ pag
   await page.getByTestId('skin-brown').click();
   await expect(page.getByTestId('skin-brown')).toHaveAttribute('aria-checked', 'true');
   await page.getByTestId('custom-colors-toggle').check();
-  await page.getByTestId('hex-bottom').fill('#7a2836');
+  // real keystrokes (the PR review bug: "#7a2" used to be expanded to "#77aa22" mid-typing)
+  await page.getByTestId('hex-bottom').fill('');
+  await page.getByTestId('hex-bottom').pressSequentially('#7a2836', { delay: 50 }); // human typing speed
+  await expect(page.getByTestId('hex-bottom')).toHaveValue('#7a2836');
   await expect(page.getByTestId('color-bottom')).toHaveAttribute('data-value', '#7a2836');
   await page.getByTestId('toggle-walk').click(); // idle frame, front view: skirt visible
   await expect.poll(() => previewHasColor(page, [122, 40, 54])).toBe(true);
