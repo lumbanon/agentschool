@@ -111,6 +111,8 @@ export interface MapObjects {
   doors: DoorZone[];
   npcPoints: Record<string, Vec2>; // actorId -> point
   interactableZones: InteractableZone[];
+  seats: SeatZone[];
+  props: PropZone[];
 }
 
 export interface Rect {
@@ -130,15 +132,36 @@ export interface InteractableZone extends Rect {
   interactableId: string;
 }
 
+/**
+ * Somewhere the player can sit (chair, bench, stool...). The rectangle is the
+ * interaction zone (e.g. desk + chair); `sit` is where the player is placed.
+ * Tiled: object type `seat`, optional properties `facing`, `sitX`, `sitY`, `prompt`.
+ */
+export interface SeatZone extends Rect {
+  id: string;
+  sit: Vec2;
+  facing: Direction;
+  prompt: string;
+}
+
+/**
+ * A runtime-textured overlay (e.g. a clock face or a window view), drawn over
+ * the tile art at an exact pixel rectangle. The engine only knows the id; the
+ * host supplies and updates the texture. Tiled: object type `prop`, property `propId`.
+ */
+export interface PropZone extends Rect {
+  propId: string;
+}
+
 // ------------------------------------------------------------------ runtime
 
-export type WorldMode = 'loading' | 'exploring' | 'interacting' | 'transitioning';
+export type WorldMode = 'loading' | 'exploring' | 'interacting' | 'transitioning' | 'seated';
 
 /** Something the player could interact with right now. */
 export interface InteractionTarget {
-  /** actor id or interactable id */
+  /** actor id, interactable id or seat id */
   id: string;
-  kind: 'actor' | 'interactable';
+  kind: 'actor' | 'interactable' | 'seat';
   prompt: string;
 }
 
@@ -157,7 +180,10 @@ export type WorldEvent =
   | { type: 'interaction.started'; target: InteractionTarget; dialogue?: DialogueScript }
   | { type: 'action.requested'; action: ActionDescriptor; sourceId: string }
   | { type: 'interaction.ended'; targetId: string }
-  | { type: 'mode.changed'; mode: WorldMode };
+  | { type: 'mode.changed'; mode: WorldMode }
+  | { type: 'world.error'; message: string }
+  | { type: 'seat.entered'; seatId: string }
+  | { type: 'seat.left'; seatId: string };
 
 export type WorldEventType = WorldEvent['type'];
 export type WorldEventOf<K extends WorldEventType> = Extract<WorldEvent, { type: K }>;

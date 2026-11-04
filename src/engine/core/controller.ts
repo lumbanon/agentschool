@@ -19,8 +19,8 @@ export interface ActiveInteraction {
  * Renderer-independent world state machine.
  *
  *   loading ──► exploring ◄──► interacting
- *                   │  ▲
- *                   ▼  │
+ *                 │  ▲  ▲
+ *                 ▼  │  └──► seated   (interact on a seat; stand() returns)
  *              transitioning
  *
  * The Phaser scene asks `canMove()` every frame and reports targets/doors;
@@ -32,6 +32,7 @@ export class WorldController {
   private _roomId: string;
   private _target: InteractionTarget | null = null;
   private _active: ActiveInteraction | null = null;
+  private _seatId: string | null = null;
 
   constructor(
     readonly definition: WorldDefinition,
@@ -51,6 +52,10 @@ export class WorldController {
   }
   get activeInteraction(): ActiveInteraction | null {
     return this._active;
+  }
+  /** Seat the player currently occupies (mode 'seated'), else null. */
+  get seatId(): string | null {
+    return this._seatId;
   }
 
   canMove(): boolean {
@@ -90,6 +95,7 @@ export class WorldController {
   interact(): boolean {
     if (this._mode !== 'exploring' || !this._target) return false;
     const target = this._target;
+    if (target.kind === 'seat') return this.sit(target.id);
     const def = this.resolveInteraction(target);
     if (!def) return false;
     this._active = { target, dialogue: def.dialogue };
@@ -99,6 +105,26 @@ export class WorldController {
     this.setMode('interacting');
     this.bus.emit({ type: 'interaction.started', target, dialogue: def.dialogue });
     if (!def.dialogue && def.action) this.requestAction(def.action);
+    return true;
+  }
+
+  /** Take a seat. Movement stops until stand() is called. */
+  private sit(seatId: string): boolean {
+    this._target = null;
+    this.bus.emit({ type: 'interaction.targetChanged', target: null });
+    this._seatId = seatId;
+    this.setMode('seated');
+    this.bus.emit({ type: 'seat.entered', seatId });
+    return true;
+  }
+
+  /** Leave the current seat. Returns false if not seated. */
+  stand(): boolean {
+    if (this._mode !== 'seated' || !this._seatId) return false;
+    const seatId = this._seatId;
+    this._seatId = null;
+    this.setMode('exploring');
+    this.bus.emit({ type: 'seat.left', seatId });
     return true;
   }
 
@@ -139,5 +165,10 @@ export class WorldController {
       transition: { fromRoom: this._roomId, toRoom: door.targetRoom, spawn: door.targetSpawn },
     });
     return true;
+  }
+
+  /** The renderer failed (e.g. an asset did not load). Surfaced to the UI; does not change mode. */
+  reportError(message: string): void {
+    this.bus.emit({ type: 'world.error', message });
   }
 }

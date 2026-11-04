@@ -100,3 +100,44 @@ describe('WorldController', () => {
     expect(action && action.type === 'action.requested' && action.action.kind).toBe('office.openTask');
   });
 });
+
+describe('WorldController seats (reusable sit interaction)', () => {
+  const seat = { id: 'seat_6_6', kind: 'seat' as const, prompt: 'Sit at the desk' };
+
+  it('interacting with a seat sits down, blocks movement and doors, and stand() restores exploring', () => {
+    const { c, types } = setup();
+    c.roomReady('classroom', 'from_hallway');
+    c.setTarget(seat);
+    expect(c.interact()).toBe(true);
+    expect(c.mode).toBe('seated');
+    expect(c.seatId).toBe('seat_6_6');
+    expect(c.canMove()).toBe(false);
+    expect(types()).toContain('seat.entered');
+    // nothing else can start while seated
+    c.setTarget(teacher);
+    expect(c.target).toBeNull();
+    expect(c.interact()).toBe(false);
+    const door = { name: 'd', x: 0, y: 0, width: 16, height: 16, targetRoom: 'hallway', targetSpawn: 'from_classroom' };
+    expect(c.beginTransition(door)).toBe(false);
+    expect(c.stand()).toBe(true);
+    expect(c.mode).toBe('exploring');
+    expect(c.seatId).toBeNull();
+    expect(c.canMove()).toBe(true);
+    expect(types().slice(-2)).toEqual(['mode.changed', 'seat.left']);
+  });
+
+  it('stand() does nothing unless seated', () => {
+    const { c } = setup();
+    c.roomReady('classroom', 'from_hallway');
+    expect(c.stand()).toBe(false);
+    expect(c.mode).toBe('exploring');
+  });
+
+  it('works in the office world too (no school-specific code)', () => {
+    const { c } = setup(officeWorld);
+    c.roomReady('office', 'start');
+    c.setTarget({ id: 'any_chair', kind: 'seat', prompt: 'Sit' });
+    expect(c.interact()).toBe(true);
+    expect(c.mode).toBe('seated');
+  });
+});

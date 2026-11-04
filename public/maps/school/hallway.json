@@ -11,7 +11,7 @@
  "tilewidth": 16,
  "tileheight": 16,
  "nextlayerid": 5,
- "nextobjectid": 5,
+ "nextobjectid": 15,
  "layers": [
   {
    "id": 1,
@@ -718,6 +718,186 @@
        "name": "interactableId",
        "type": "string",
        "value": "hallway_noticeboard"
+      }
+     ]
+    },
+    {
+     "id": 5,
+     "name": "clock",
+     "type": "interactable",
+     "x": 288,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_clock"
+      }
+     ]
+    },
+    {
+     "id": 6,
+     "name": "clock_face",
+     "type": "prop",
+     "x": 291,
+     "y": 18,
+     "width": 10,
+     "height": 9,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "propId",
+       "type": "string",
+       "value": "clock"
+      }
+     ]
+    },
+    {
+     "id": 7,
+     "name": "locker_1",
+     "type": "interactable",
+     "x": 96,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_locker_1"
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "name": "locker_2",
+     "type": "interactable",
+     "x": 128,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_locker_2"
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "name": "locker_3",
+     "type": "interactable",
+     "x": 160,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_locker_3"
+      }
+     ]
+    },
+    {
+     "id": 10,
+     "name": "locker_4",
+     "type": "interactable",
+     "x": 192,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_locker_4"
+      }
+     ]
+    },
+    {
+     "id": 11,
+     "name": "locker_5",
+     "type": "interactable",
+     "x": 224,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_locker_5"
+      }
+     ]
+    },
+    {
+     "id": 12,
+     "name": "locker_6",
+     "type": "interactable",
+     "x": 256,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_locker_6"
+      }
+     ]
+    },
+    {
+     "id": 13,
+     "name": "returns_shelf",
+     "type": "interactable",
+     "x": 320,
+     "y": 16,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_shelf_returns"
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "name": "fiction_shelf",
+     "type": "interactable",
+     "x": 16,
+     "y": 112,
+     "width": 16,
+     "height": 16,
+     "rotation": 0,
+     "visible": true,
+     "properties": [
+      {
+       "name": "interactableId",
+       "type": "string",
+       "value": "hallway_shelf_fiction"
       }
      ]
     }
