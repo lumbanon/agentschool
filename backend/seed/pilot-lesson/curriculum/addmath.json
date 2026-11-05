@@ -1,0 +1,48 @@
+{
+  "contract_version": "1.0.0",
+  "kind": "curriculum",
+  "subject": {
+    "id": "addmath",
+    "spm_code": "3472",
+    "name": { "en": "Additional Mathematics", "ms": "Matematik Tambahan" }
+  },
+  "framework": {
+    "name": "KSSM",
+    "document": "DSKP KSSM Matematik Tambahan Tingkatan 4 dan 5",
+    "source": {
+      "kind": "official_reference",
+      "citation": "Kementerian Pendidikan Malaysia, DSKP KSSM Matematik Tambahan Tingkatan 4 dan 5. EXAMPLE ONLY: the codes and titles in this sample file are illustrative and have not been checked against the DSKP."
+    }
+  },
+  "forms": [
+    {
+      "form": 4,
+      "chapters": [
+        {
+          "id": "addmath-f4-c02",
+          "number": 2,
+          "title": { "en": "Quadratic Functions", "ms": "Fungsi Kuadratik" },
+          "content_standards": [
+            {
+              "id": "addmath-f4-c02-cs-2-1",
+              "code": "2.1",
+              "title": { "en": "Quadratic equations and inequalities", "ms": "Persamaan dan ketaksamaan kuadratik" },
+              "learning_standards": [
+                {
+                  "id": "addmath-f4-c02-ls-2-1-1",
+                  "code": "2.1.1",
+                  "description": { "en": "Solve quadratic equations (example standard)." }
+                },
+                {
+                  "id": "addmath-f4-c02-ls-2-1-3",
+                  "code": "2.1.3",
+                  "description": { "en": "Solve quadratic inequalities (example standard)." }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

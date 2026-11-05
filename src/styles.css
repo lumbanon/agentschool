@@ -834,3 +834,55 @@ button.danger {
   font-size: 0.9rem;
   pointer-events: none;
 }
+
+/* ---------------------------------------------------------------- backend lessons (Phase 1) */
+.badge-approved {
+  color: #10331d;
+  background: #7bd389;
+}
+.badge-checked {
+  color: #2a1f08;
+  background: var(--accent);
+}
+.lesson-notice {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--mock);
+  background: #1f2a33;
+  color: var(--mock);
+  font-size: 0.85rem;
+}
+.verdict {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.verdict-correct {
+  border-color: #7bd389;
+  background: #1c2e22;
+}
+.verdict-incorrect {
+  border-color: var(--danger);
+  background: #2e1c20;
+}
+.verdict-invalid_input,
+.verdict-not_verifiable {
+  border-color: var(--mock);
+}
+.verdict p {
+  margin: 0.35rem 0 0;
+}
+.verdict-read {
+  color: var(--muted);
+}
+.worked {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+}
+.hint {
+  margin-top: 0.5rem;
+  color: var(--muted);
+}

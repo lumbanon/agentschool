@@ -3,19 +3,57 @@ import { MockBadge, SourceBadge } from '../../app/components/SourceBadge';
 import { PanelShell } from '../../app/components/PanelShell';
 import type { DomainPanelProps } from '../../app/panels';
 import type { OpenLessonPayload } from './actions';
+import { answerToTex } from './answerTex';
+import { fetchLesson, type LessonLoad } from './api';
 import { LESSONS } from './lessons';
 import { loadProgress, saveProgress, type LessonProgress } from './progress';
+import { RemoteLessonPanel } from './RemoteLessonPanel';
 import { RichText, Tex } from './Tex';
 
-/** Light-touch conversion of a typed answer into TeX for the live preview (display only). */
-export function answerToTex(text: string): string {
-  return text
-    .replace(/\\/g, '')
-    .replace(/\b(or|atau)\b/gi, '\\text{ or }')
-    .replace(/sqrt\(([^)]*)\)/g, '\\sqrt{$1}');
+export { answerToTex };
+
+/**
+ * Lessons served by the backend, with the offline mock used when the backend
+ * is unreachable or the lesson is not approved yet. Ids not listed here are
+ * Phase 0 mock lessons only.
+ */
+export const BACKEND_LESSONS: Readonly<Record<string, string>> = {
+  'addmath-f4-c02-l01': 's3-factorisation',
+};
+
+const FALLBACK_NOTICE: Record<Exclude<LessonLoad['kind'], 'ok'>, string> = {
+  not_available: 'This lesson is waiting for teacher review, so the offline practice version is shown. Answers are not checked.',
+  offline: 'The lesson server is not reachable, so the offline practice version is shown. Answers are not checked.',
+};
+
+export function LessonPanel(props: DomainPanelProps) {
+  const payload = (props.action.payload ?? {}) as Partial<OpenLessonPayload>;
+  if (!payload.lessonId || !(payload.lessonId in BACKEND_LESSONS)) return <MockLessonPanel {...props} />;
+  return <BackendLesson {...props} lessonId={payload.lessonId} startAt={payload.startAt} />;
 }
 
-export function LessonPanel({ action, onClose }: DomainPanelProps) {
+function BackendLesson({ action, onClose, lessonId, startAt }: DomainPanelProps & { lessonId: string; startAt?: 'board' | 'exercise' }) {
+  const [load, setLoad] = useState<LessonLoad | null>(null);
+  useEffect(() => {
+    let live = true;
+    void fetchLesson(lessonId).then((r) => live && setLoad(r));
+    return () => {
+      live = false;
+    };
+  }, [lessonId]);
+  if (!load) {
+    return (
+      <PanelShell title="Loading lesson…" onClose={onClose} testId="lesson-loading">
+        <p className="muted">Fetching the lesson from the curriculum server…</p>
+      </PanelShell>
+    );
+  }
+  if (load.kind === 'ok') return <RemoteLessonPanel lesson={load.lesson} startAt={startAt} onClose={onClose} />;
+  const mockAction = { ...action, payload: { ...action.payload, lessonId: BACKEND_LESSONS[lessonId] } };
+  return <MockLessonPanel action={mockAction} onClose={onClose} notice={FALLBACK_NOTICE[load.kind]} />;
+}
+
+export function MockLessonPanel({ action, onClose, notice }: DomainPanelProps & { notice?: string }) {
   const payload = (action.payload ?? {}) as Partial<OpenLessonPayload>;
   const lesson = payload.lessonId ? LESSONS[payload.lessonId] : undefined;
 
@@ -68,6 +106,11 @@ export function LessonPanel({ action, onClose }: DomainPanelProps) {
         </>
       }
     >
+      {notice && (
+        <p className="lesson-notice" role="note" data-testid="lesson-fallback-notice">
+          {notice}
+        </p>
+      )}
       <div className="lesson-tabs" role="tablist">
         <button role="tab" aria-selected={progress.phase === 'board'} onClick={() => update({ phase: 'board' })} data-testid="tab-board">
           Blackboard

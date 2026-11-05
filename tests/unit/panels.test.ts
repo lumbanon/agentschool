@@ -5,6 +5,7 @@ import { DOMAIN_PANELS } from '../../src/domains';
 import { LESSONS } from '../../src/domains/school/lessons';
 import { WORLDS } from '../../src/worlds/registry';
 import { SCHOOL_ACTIONS } from '../../src/domains/school/actions';
+import { BACKEND_LESSONS } from '../../src/domains/school/LessonPanel';
 import { ENVIRONMENT_ACTIONS } from '../../src/environment/actions';
 
 /** Actions handled as effects (no panel) by the environment layer (see useEnvironment). */
@@ -33,9 +34,10 @@ describe('domain panel registry', () => {
     });
   }
 
-  it('every lesson the school world opens exists and is a labelled prototype', () => {
+  it('every lesson the school world opens has a labelled offline version (directly or as a backend fallback)', () => {
     for (const a of actionsOf(WORLDS.school).filter((x) => x.kind === SCHOOL_ACTIONS.openLesson)) {
-      const lesson = LESSONS[String(a.payload?.lessonId)];
+      const id = String(a.payload?.lessonId);
+      const lesson = LESSONS[BACKEND_LESSONS[id] ?? id];
       expect(lesson).toBeDefined();
       expect(lesson.source).toBe('prototype_script');
       expect(lesson.board.length).toBeGreaterThan(0);

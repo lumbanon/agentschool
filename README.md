@@ -32,6 +32,16 @@ npm run dev                       # http://localhost:5173  (?world=office to sta
 **Controls:** WASD / arrows to move · E or Space to interact · Space/Enter to advance dialogue ·
 1–9 to pick a choice · Esc to close.
 
+## Phase 1 backend
+
+[`backend/`](backend/README.md) is a FastAPI + PostgreSQL service. It holds the SPM curriculum database (Additional
+Mathematics, Mathematics, Science; Forms 4–5), bulk dataset and document import against the versioned contract in
+[`docs/contracts`](docs/contracts/README.md), and SymPy answer checking.
+
+The teacher's lesson (`addmath-f4-c02-l01`) now comes from the API once a teacher has approved it. Until then, or
+whenever the API is down, the classroom shows the labelled offline mock lesson. Decisions:
+[ADR-011](docs/adr/ADR-011-phase-1-backend.md).
+
 ## Architecture
 
 ```

@@ -1,0 +1,33 @@
+{
+  "contract": "agentschool.curriculum-import",
+  "contract_version": "1.0.0",
+  "dataset": {
+    "id": "pilot-lesson",
+    "title": "Phase 1 pilot: one Additional Mathematics lesson for the virtual classroom",
+    "version": "1.0.0",
+    "created_at": "2026-11-05T00:00:00Z",
+    "created_by": "AgentSchool Phase 1 backend",
+    "description": "The Phase 0 quadratic-factorisation lesson in contract v1 form. Curriculum codes are placeholders until the curriculum research dataset replaces them. Lesson and exercises are pending human review.",
+    "languages": [
+      "en",
+      "ms"
+    ]
+  },
+  "files": [
+    {
+      "path": "curriculum/addmath.json",
+      "kind": "curriculum",
+      "sha256": "0e6c8561fe01287e6d959b884f653efeef8e1509a17422699c7a7bb669d170a9"
+    },
+    {
+      "path": "exercises/addmath-f4-c02.json",
+      "kind": "exercises",
+      "sha256": "49779f3b39688d7941c3b7622a659c5346a027b9fffeec96435393344555aefc"
+    },
+    {
+      "path": "lessons/addmath-f4-c02.json",
+      "kind": "lessons",
+      "sha256": "695f69eaa3695637e642254c2e6ac23fcf09bc1d6edf69a35ddb8ace83a2e513"
+    }
+  ]
+}

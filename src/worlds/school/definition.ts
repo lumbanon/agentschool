@@ -38,7 +38,7 @@ export const schoolWorld: WorldDefinition = {
             {
               text: 'Shall we start the lesson?',
               choices: [
-                { label: 'Start the lesson', action: { kind: SCHOOL_ACTIONS.openLesson, payload: { lessonId: 's3-factorisation' } } },
+                { label: 'Start the lesson', action: { kind: SCHOOL_ACTIONS.openLesson, payload: { lessonId: 'addmath-f4-c02-l01' } } },
                 { label: 'Maybe later', closes: true },
               ],
             },
@@ -53,7 +53,7 @@ export const schoolWorld: WorldDefinition = {
       roomId: 'classroom',
       interaction: {
         prompt: 'Read the blackboard',
-        action: { kind: SCHOOL_ACTIONS.openLesson, payload: { lessonId: 's3-factorisation', startAt: 'board' } },
+        action: { kind: SCHOOL_ACTIONS.openLesson, payload: { lessonId: 'addmath-f4-c02-l01', startAt: 'board' } },
       },
     },
     {

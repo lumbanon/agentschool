@@ -1,0 +1,22 @@
+# Local development database for the AgentSchool backend.
+# Port 5433 (not 5432) so it never collides with a locally installed PostgreSQL.
+services:
+  db:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: agentschool
+      POSTGRES_PASSWORD: agentschool-dev
+      POSTGRES_DB: agentschool
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - agentschool-pg:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/10-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentschool -d agentschool"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  agentschool-pg:

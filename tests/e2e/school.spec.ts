@@ -11,6 +11,9 @@ import { approachTeacher, enterClassroom, expectTarget, hold, snap, waitForRoom,
 test.beforeEach(async ({ page }) => {
   // Returning player: a saved character skips the creator (see character.spec.ts for first-time players).
   await seedCharacter(page);
+  // These flows test the offline classroom: no backend, so lessons fall back to the labelled mock.
+  // The backend-connected lesson is covered by lesson-api.spec.ts and fullstack.spec.ts.
+  await page.route('**/api/**', (route) => route.abort());
   await page.goto('/');
   await page.evaluate(() => sessionStorage.clear());
   await page.reload();
@@ -89,6 +92,7 @@ test('full flow: door, teacher, mock lesson with KaTeX, answer, close, resume', 
   await expect(panel).toBeVisible();
   await expect(panel).toContainText('Solving quadratic equations by factorisation');
   await expect(panel.getByTestId('mock-badge')).toContainText('not graded');
+  await expect(panel.getByTestId('lesson-fallback-notice')).toContainText('not reachable');
   await expect(panel.locator('.katex').first()).toBeVisible();
   for (let i = 0; i < 4; i++) await panel.getByTestId('board-next').click();
   await expect(panel.getByTestId('board-step')).toHaveCount(5);
